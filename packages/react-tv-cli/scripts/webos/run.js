@@ -112,7 +112,7 @@ function run(root, device) {
     if (!device) {
       const runningVMS = execSync(`vboxmanage list runningvms`).toString();
       if (attemps > 30) {
-        console.log('FAILED start VirtualBox Emulator');
+        console.log(chalk.red('Failed to start VirtualBox Emulator'));
         clearInterval(task);
       }
 

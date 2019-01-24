@@ -101,7 +101,7 @@ function run(root, device) {
   if (!device) {
     console.log('');
     console.log(chalk.dim('Which device should the app be run on?'));
-    execSync(`ares-setup-device --list`);
+    execSync(`${webOS_TV_SDK_ENV}/ares-setup-device --list`);
     console.log(
       chalk.yellow(' Choose a device and run `react-tv-cli run-webos <device>`')
     );

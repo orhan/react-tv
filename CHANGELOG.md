@@ -36,7 +36,7 @@
 
 - support style prop
 - yarn workspaces (split into `react-tv-cli` and `react-tv`)
-- `react-tv-cli setup-webos` for setup WebOS devices
+- `react-tv-cli setup-webos` for setup webOS devices
 - `react-tv-cli get-key-webos <device>` for get key file from device
 - react-reconciler 0.7.0
 - support className
@@ -110,7 +110,7 @@
 # 0.1.3
 
 - cli: fix path on create apptv template
-- Platform check for WebOS
+- Platform check for webOS
 - Add common ignore for npmignore
 
 # 0.1.2

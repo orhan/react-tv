@@ -32,7 +32,7 @@ function runEmulator(ENV) {
   }
 }
 
-function run(root, device) {
+function run(root, device, run, inspect) {
   let webOS_TV_SDK_ENV = process.env.WEBOS_CLI_TV || false;
   let optDevice = '';
 
@@ -108,10 +108,14 @@ function run(root, device) {
     console.log(chalk.yellow('└─ Choose a device and run `react-tv-cli run-webos <device name>`'));
     console.log('');
     console.log(chalk.red('Error: Aborting, please specify a device to install the app onto!'));
+    console.log('');
     return false;
   }
 
   let attemps = 0;
+  const config = JSON.parse(fs.readFileSync(`${webosPath}/appinfo.json`).toString());
+  const latestIPK = config.id + '_' + config.version + '_all.ipk';
+
   const task = setInterval(function() {
     if (!device) {
       const runningVMS = execSync(`vboxmanage list runningvms`).toString();
@@ -127,46 +131,55 @@ function run(root, device) {
 
       console.log(runningVMS);
     } else {
-      console.log(chalk.dim('Running app on', device));
+      console.log('');
+      console.log(chalk.yellow((inspect ? 'Debugging' : 'Running') + ` "${config.title}" on "${device}"`));
     }
 
     clearInterval(task);
 
-    console.log(chalk.dim('Creating IPK package...'));
-
+    console.log('');
+    console.log(chalk.yellow('Creating IPK package...'));
     execSync(`${webOS_TV_SDK_ENV}/ares-package .`, {cwd: webosPath});
     console.log(chalk.green(`└─ Succesfully created IPK package!`));
 
     cleanup();
 
-    console.log(chalk.dim('Installing...'));
-    const config = JSON.parse(
-      fs.readFileSync(`${webosPath}/appinfo.json`).toString()
-    );
+    if (install) {
+      console.log('');
+      console.log(chalk.yellow('Installing...'));
 
-    const latestIPK = config.id + '_' + config.version + '_all.ipk';
-    console.log(chalk.blue(` Installing ${latestIPK} on ${device} ...`));
-    execSync(`${webOS_TV_SDK_ENV}/ares-install ${optDevice} ${latestIPK}`, {
-      cwd: webosPath,
-    });
-    console.log(chalk.green(`└─ Succesfully installed ${config.title}`));
+      console.log(chalk.blue(`└─ Installing "${latestIPK}" on "${device}" ...`));
+      execSync(`${webOS_TV_SDK_ENV}/ares-install ${optDevice} ${latestIPK}`, {
+        cwd: webosPath,
+      });
+      console.log(chalk.green(`└─ Succesfully installed app`));
 
-    console.log(chalk.dim('Launching app...'));
-    execSync(`${webOS_TV_SDK_ENV}/ares-launch ${optDevice} ${config.id}`, {
-      cwd: webosPath,
-    });
-    console.log(chalk.green(`└─ Launched app`));
+      console.log('');
+      console.log(chalk.yellow(`Launching app...`));
+      execSync(`${webOS_TV_SDK_ENV}/ares-launch ${optDevice} ${config.id}`, {
+        cwd: webosPath,
+      });
+      console.log(chalk.green(`└─ Launched app`));
 
-    console.log(chalk.dim('Inspecting...'));
-    spawnSync(
-      `${webOS_TV_SDK_ENV}/ares-inspect`,
-      [`-a ${config.id} ${optDevice}`],
-      {
-        stdio: 'inherit',
-        shell: true,
-        encoding: 'utf8',
+      if (inspect) {
+        console.log('');
+        console.log(chalk.yellow('Inspecting app...'));
+        spawnSync(
+          `${webOS_TV_SDK_ENV}/ares-inspect`,
+          [`-a ${config.id} ${optDevice}`],
+          {
+            stdio: 'inherit',
+            shell: true,
+            encoding: 'utf8',
+          }
+        );
+      } else {
+        console.log('');
+        console.log(chalk.dim(`Successfully built release package "${latestIPK}", check folder "${webosPath}"`));
+        console.log('');
       }
-    );
+    }
+
   }, 500);
 }
 

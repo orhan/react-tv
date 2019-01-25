@@ -21,12 +21,28 @@ switch (command) {
     createReactTVApp(appName);
     break;
 
+  case 'build-prod-webos':
+    if (argv.length > 3) {
+      device = argv[3];
+    }
+
+    WebOS.run(process.cwd(), device, false, false);
+    break;
+
   case 'run-webos':
     if (argv.length > 3) {
       device = argv[3];
     }
 
-    WebOS.run(process.cwd(), device);
+    WebOS.run(process.cwd(), device, true, false);
+    break;
+
+  case 'debug-webos':
+    if (argv.length > 3) {
+      device = argv[3];
+    }
+
+    WebOS.run(process.cwd(), device, true, true);
     break;
 
   case 'setup-webos':

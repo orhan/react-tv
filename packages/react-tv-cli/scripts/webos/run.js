@@ -33,6 +33,7 @@ function runEmulator(ENV) {
 }
 
 function run(root, device, install, inspect) {
+  const totalSteps = install ? (inspect ? 5 : 4) : 3;
   let webOS_TV_SDK_ENV = process.env.WEBOS_CLI_TV || false;
   let optDevice = '';
 
@@ -47,7 +48,7 @@ function run(root, device, install, inspect) {
   process.env.PATH = `${webOS_TV_SDK_ENV}:${process.env.PATH}`;
 
   if (!isReactTVWebOSProject(root)) {
-    const msg = `This project isn\'t a React-TV webOS Project:\n> Just run "react-tv init"`;
+    const msg = `❌  This project isn\'t a React-TV webOS Project:\n> Just run "react-tv init"`;
     return console.log(chalk.dim('[react-tv]'), msg);
   }
 
@@ -55,13 +56,13 @@ function run(root, device, install, inspect) {
   const ReactTVConfig = packageJson['react-tv'];
   if (!ReactTVConfig) {
     return console.log(
-      chalk.dim('[react-tv]'),
+      chalk.dim('⚠️  [react-tv]'),
       'You should set react-tv properties in your package.json'
     );
   }
 
   if (!ReactTVConfig.files || !ReactTVConfig.files.length) {
-    return console.log(chalk.dim('[react-tv]'), 'You should add files');
+    return console.log(chalk.dim('⚠️  [react-tv]'), 'You should add files');
   }
 
   const webosPath = path.resolve(root, 'react-tv/webos');
@@ -95,18 +96,18 @@ function run(root, device, install, inspect) {
       fs.copySync(`${filePath}`, `${toFile}`);
     });
   } catch (e) {
-    return console.log(chalk.red('Failed to mount'), e.toString());
+    return console.log(chalk.red('❌  Failed to mount'), e.toString());
   }
 
   if (!device) {
     console.log('');
-    console.log(chalk.red('You haven\'t specified a device, listing your webOS devices:'));
+    console.log(chalk.red('❗️  You haven\'t specified a device, listing your webOS devices:'));
     console.log('');
     const devices = execSync(`${webOS_TV_SDK_ENV}/ares-setup-device --list`, {cwd: webosPath}).toString();
     console.log(devices);
-    console.log(chalk.yellow('└─ Choose a device and run `react-tv-cli run-webos <device name>`'));
+    console.log(chalk.yellow('└─ ⚠️  Choose a device and run `react-tv-cli run-webos <device name>`'));
     console.log('');
-    console.log(chalk.red('Error: Aborting, please specify a device to install the app onto!'));
+    console.log(chalk.red('❌  Error: Aborting, please specify a device to install the app onto!'));
     console.log('');
     return false;
   }
@@ -119,7 +120,7 @@ function run(root, device, install, inspect) {
     if (!device) {
       const runningVMS = execSync(`vboxmanage list runningvms`).toString();
       if (attemps > 30) {
-        console.log(chalk.red('Failed to start VirtualBox Emulator, aborting.'));
+        console.log(chalk.red('❌  Failed to start VirtualBox Emulator, aborting.'));
         clearInterval(task);
       }
 
@@ -131,38 +132,45 @@ function run(root, device, install, inspect) {
       console.log(runningVMS);
     } else {
       console.log('');
-      console.log(chalk.yellow((inspect ? 'Debugging' : 'Running') + ` "${config.title}" on "${device}"`));
+      console.log(chalk.dim(`[1/${totalSteps}] `) + chalk.yellow((inspect ? '🔧  Preparing to debug' : '👟  Preparing to run') + ` "${config.title}" on "${device}"...`));
     }
 
     clearInterval(task);
 
     console.log('');
-    console.log(chalk.yellow('Creating IPK package...'));
-    execSync(`${webOS_TV_SDK_ENV}/ares-package .`, {cwd: webosPath});
-    console.log(chalk.green(`└─ Succesfully created IPK package`));
+    console.log(chalk.dim(`[2/${totalSteps}] `) + chalk.yellow('📦  Creating IPK package...'));
+    execSync(
+      `${webOS_TV_SDK_ENV}/ares-package .`,
+      { cwd: webosPath, stdio: ['pipe', 'pipe', 'ignore'] },
+      function(err, stdout, stderr) {
+        // EMPTY!
+      }
+    );
+    console.log(chalk.green(`         └─ ✔  Succesfully created IPK package`));
 
     cleanup();
 
     if (install) {
       console.log('');
-      console.log(chalk.yellow('Installing...'));
-
-      console.log(chalk.blue(`└─ Installing "${latestIPK}" on "${device}" ...`));
+      console.log(chalk.dim(`[3/${totalSteps}] `) + chalk.yellow('📺  Installing...'));
+      console.log(chalk.blue(`         └─ ➡️  Installing "${latestIPK}" on "${device}" ...`));
       execSync(`${webOS_TV_SDK_ENV}/ares-install ${optDevice} ${latestIPK}`, {
         cwd: webosPath,
       });
-      console.log(chalk.green(`└─ Succesfully installed app`));
+      console.log(chalk.green(`         └─ ✔  Succesfully installed app`));
 
       console.log('');
-      console.log(chalk.yellow(`Launching app...`));
+      console.log(chalk.dim(`[4/${totalSteps}] `) + chalk.yellow(`🚀  Launching app...`));
       execSync(`${webOS_TV_SDK_ENV}/ares-launch ${optDevice} ${config.id}`, {
         cwd: webosPath,
       });
-      console.log(chalk.green(`└─ Launched app`));
+      console.log(chalk.green(`         └─ ✔  Launched app`));
 
       if (inspect) {
         console.log('');
-        console.log(chalk.yellow('Inspecting app...'));
+        console.log(chalk.dim(`[5/${totalSteps}] `) + chalk.yellow('🔬  Inspecting app...'));
+        console.log('');
+
         spawnSync(
           `${webOS_TV_SDK_ENV}/ares-inspect`,
           [`-a ${config.id} ${optDevice}`],
@@ -174,9 +182,9 @@ function run(root, device, install, inspect) {
         );
       } else {
         console.log('');
-        console.log(chalk.dim(`✨ Successfully built release package "${latestIPK}", check folder "${webosPath}"`));
-        console.log('');
       }
+    } else {
+      console.log(chalk.dim(`[3/${totalSteps}] `) + chalk.dim(`✨  Successfully built release package: `) + chalk.blue(`${webosPath}/${latestIPK}`));
     }
 
   }, 500);

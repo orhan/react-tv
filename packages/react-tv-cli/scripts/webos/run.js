@@ -100,13 +100,14 @@ function run(root, device) {
 
   if (!device) {
     console.log('');
-    console.log(chalk.red('Error: You haven\'t specified a device, aborting.'));
-    console.log(chalk.dim('└─ Listing your webOS devices:'));
+    console.log(chalk.red('You haven\'t specified a device, listing your webOS devices:'));
     console.log('');
     const devices = execSync(`${webOS_TV_SDK_ENV}/ares-setup-device --list`, {cwd: webosPath}).toString();
     console.log(devices);
 
     console.log(chalk.yellow('└─ Choose a device and run `react-tv-cli run-webos <device name>`'));
+    console.log('');
+    console.log(chalk.red('Error: Aborting, please specify a device to install the app onto!'));
     return false;
   }
 

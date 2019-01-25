@@ -106,7 +106,9 @@ function run(root, device, install, inspect) {
     console.log(devices);
     console.log(chalk.yellow('└─ Choose a device and run `react-tv-cli run-webos <device name>`'));
     console.log('');
-    return console.log(chalk.red('Error: Aborting, please specify a device to install the app onto!'));;
+    console.log(chalk.red('Error: Aborting, please specify a device to install the app onto!'));
+    console.log('');
+    return false;
   }
 
   let attemps = 0;

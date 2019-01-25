@@ -141,30 +141,29 @@ function run(root, device, install, inspect) {
     console.log(chalk.dim(`[2/${totalSteps}] `) + chalk.yellow('📦  Creating IPK package...'));
     execSync(
       `${webOS_TV_SDK_ENV}/ares-package .`,
-      { cwd: webosPath, stdio: ['pipe', 'pipe', 'ignore'] },
-      function(err, stdout, stderr) {
-        // EMPTY!
-      }
+      { cwd: webosPath },
     );
-    console.log(chalk.green(`         └─ ✔  Succesfully created IPK package`));
+    console.log(chalk.green(`         └─ ✔ Done`));
 
     cleanup();
 
     if (install) {
       console.log('');
       console.log(chalk.dim(`[3/${totalSteps}] `) + chalk.yellow('📺  Installing...'));
-      console.log(chalk.blue(`         └─ ➡️  Installing "${latestIPK}" on "${device}" ...`));
-      execSync(`${webOS_TV_SDK_ENV}/ares-install ${optDevice} ${latestIPK}`, {
-        cwd: webosPath,
-      });
-      console.log(chalk.green(`         └─ ✔  Succesfully installed app`));
+      console.log(chalk.blue(`         └─ ➤ Installing "${latestIPK}" on "${device}" ...`));
+      execSync(
+        `${webOS_TV_SDK_ENV}/ares-install ${optDevice} ${latestIPK}`,
+        { cwd: webosPath },
+      );
+      console.log(chalk.green(`         └─ ✔ Done`));
 
       console.log('');
       console.log(chalk.dim(`[4/${totalSteps}] `) + chalk.yellow(`🚀  Launching app...`));
-      execSync(`${webOS_TV_SDK_ENV}/ares-launch ${optDevice} ${config.id}`, {
-        cwd: webosPath,
-      });
-      console.log(chalk.green(`         └─ ✔  Launched app`));
+      execSync(
+        `${webOS_TV_SDK_ENV}/ares-launch ${optDevice} ${config.id}`,
+        { cwd: webosPath },
+      );
+      console.log(chalk.green(`         └─ ✔ Done`));
 
       if (inspect) {
         console.log('');

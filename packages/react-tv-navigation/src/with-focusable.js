@@ -22,11 +22,13 @@ const withFocusable = compose(
     currentFocusPath,
     focusPath,
     setFocus = () => {},
+    disabled,
     ...props
   }) => ({
     focused: currentFocusPath === focusPath,
     setFocus: setFocus.bind(null, focusPath),
     focusPath,
+    disabled,
     ...props,
   })),
   withHandlers({
@@ -34,11 +36,10 @@ const withFocusable = compose(
   }),
   lifecycle({
     addFocusable() {
-      const { focusPath, onEnterPressHandler } = this.props;
-      console.log(ReactTV.findDOMNode);
+      const { focusPath, onEnterPressHandler, disabled } = this.props;
       SpatialNavigation.addFocusable(
         ReactTV.findDOMNode(this),
-        { focusPath, onEnterPressHandler }
+        { focusPath, onEnterPressHandler, disabled }
       );
     },
     componentDidMount() {

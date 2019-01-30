@@ -3372,12 +3372,14 @@ var withFocusable$1 = compose(setPropTypes({
       focusPath = _ref.focusPath,
       _ref$setFocus = _ref.setFocus,
       setFocus = _ref$setFocus === undefined ? function () {} : _ref$setFocus,
-      props = _objectWithoutProperties(_ref, ['currentFocusPath', 'focusPath', 'setFocus']);
+      disabled = _ref.disabled,
+      props = _objectWithoutProperties(_ref, ['currentFocusPath', 'focusPath', 'setFocus', 'disabled']);
 
   return _extends({
     focused: currentFocusPath === focusPath,
     setFocus: setFocus.bind(null, focusPath),
-    focusPath: focusPath
+    focusPath: focusPath,
+    disabled: disabled
   }, props);
 }), withHandlers({
   onEnterPressHandler: function onEnterPressHandler(_ref2) {
@@ -3389,10 +3391,10 @@ var withFocusable$1 = compose(setPropTypes({
   addFocusable: function addFocusable() {
     var _props = this.props,
         focusPath = _props.focusPath,
-        onEnterPressHandler = _props.onEnterPressHandler;
+        onEnterPressHandler = _props.onEnterPressHandler,
+        disabled = _props.disabled;
 
-    console.log(ReactTV.findDOMNode);
-    SpatialNavigation$1.addFocusable(ReactTV.findDOMNode(this), { focusPath: focusPath, onEnterPressHandler: onEnterPressHandler });
+    SpatialNavigation$1.addFocusable(ReactTV.findDOMNode(this), { focusPath: focusPath, onEnterPressHandler: onEnterPressHandler, disabled: disabled });
   },
   componentDidMount: function componentDidMount() {
     this.addFocusable();

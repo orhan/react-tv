@@ -11,7 +11,7 @@ const chalk = require('chalk');
 
 const REACT_TV_VERSION = require('../../lerna.json').version;
 const packagePath = 'packages/react-tv';
-// const navigationPackagePath = 'packages/react-tv-navigation';
+const navigationPackagePath = 'packages/react-tv-navigation';
 
 let tasks = [];
 
@@ -81,13 +81,13 @@ createBundle({
   dirPath: packagePath,
 });
 
-// createBundle({
-//   entryPath: 'src/index.js',
-//   bundleType: 'development',
-//   destName: 'react-tv-navigation.development.js',
-//   dirPath: navigationPackagePath,
-//   external: ['react', 'react-tv']
-// });
+createBundle({
+  entryPath: 'src/index.js',
+  bundleType: 'development',
+  destName: 'react-tv-navigation.development.js',
+  dirPath: navigationPackagePath,
+  external: ['react', 'react-tv']
+});
 
 Promise.all(tasks).catch(error => {
   Promise.reject(error);

@@ -54,7 +54,7 @@ class SpatialNavigation {
     Navigation.focus(focusPath);
   }
 
-  addFocusable(focusDOMElement, { focusPath, onEnterPressHandler }) {
+  addFocusable(focusDOMElement, { focusPath, onEnterPressHandler, disabled }) {
     if (!focusDOMElement || Navigation.getSectionId(focusDOMElement)) {
       return;
     }
@@ -69,6 +69,10 @@ class SpatialNavigation {
     focusDOMElement.addEventListener('sn:enter-down', onEnterPressHandler);
     const sectionId = Navigation.add(...params);
     Navigation.makeFocusable(sectionId);
+
+    if (disabled) {
+      Navigation.disable(sectionId);
+    }
   }
 
   removeFocusable(focusDOMElement, { onEnterPressHandler }) {

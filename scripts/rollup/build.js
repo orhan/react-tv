@@ -86,7 +86,15 @@ createBundle({
   bundleType: 'development',
   destName: 'react-tv-navigation.development.js',
   dirPath: navigationPackagePath,
-  external: ['react', 'react-tv']
+  external: ['react', 'react-tv'],
+});
+
+createBundle({
+  entryPath: 'src/index.js',
+  bundleType: 'production',
+  destName: 'react-tv-navigation.production.js',
+  dirPath: navigationPackagePath,
+  external: ['react', 'react-tv'],
 });
 
 Promise.all(tasks).catch(error => {
